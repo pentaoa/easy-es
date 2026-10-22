@@ -16,6 +16,21 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+      - name: Supply dependencies missing from unchanged common utilities
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('easy-es-common/pom.xml')
+          dependencies = '''
+          <dependency>
+            <groupId>com.alibaba</groupId><artifactId>fastjson</artifactId><version>1.2.83</version>
+          </dependency>
+          <dependency>
+            <groupId>org.elasticsearch.client</groupId><artifactId>elasticsearch-rest-high-level-client</artifactId><version>7.17.28</version>
+          </dependency>
+          '''
+          path.write_text(path.read_text().replace('</dependencies>', dependencies + '</dependencies>'))
+          PY
       - name: Compile reactor and regression tests
         run: mvn -B -P'!release' -pl easy-es-springboot-test -am install -DskipTests
       - name: Aggregation regression suite
