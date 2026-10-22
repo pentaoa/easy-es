@@ -17,16 +17,16 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Compile reactor and regression tests
-        run: mvn -B -pl easy-es-springboot-test -am install -DskipTests
+        run: mvn -B -P'!release' -pl easy-es-springboot-test -am install -DskipTests
       - name: Aggregation regression suite
-        run: mvn -B -pl easy-es-springboot-test org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test -Dtest=AggregationTreeTest
+        run: mvn -B -P'!release' -pl easy-es-springboot-test org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test -Dtest=AggregationTreeTest
       - name: Confirm regression on original implementation
         run: |
           source=easy-es-core/src/main/java/org/dromara/easyes/core/kernel/WrapperProcessor.java
           cp "$source" /tmp/WrapperProcessor-fixed.java
           git show HEAD^:"$source" > "$source"
-          mvn -B -pl easy-es-springboot-test -am install -DskipTests
-          if mvn -B -pl easy-es-springboot-test org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test -Dtest=AggregationTreeTest > /tmp/baseline.log 2>&1; then
+          mvn -B -P'!release' -pl easy-es-springboot-test -am install -DskipTests
+          if mvn -B -P'!release' -pl easy-es-springboot-test org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test -Dtest=AggregationTreeTest > /tmp/baseline.log 2>&1; then
             cat /tmp/baseline.log
             exit 1
           fi
